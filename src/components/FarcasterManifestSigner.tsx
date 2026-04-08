@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { sdk } from '@farcaster/miniapp-sdk'
 import { useIsManifestSigned } from '@/hooks/useManifestStatus'
 
