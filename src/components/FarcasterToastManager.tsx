@@ -2,10 +2,10 @@
 
 // Mini App ID: 7930df6b-5c5f-4db4-8343-73cb761ce504
 
+import React, { useRef, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Toaster } from '@/components/ui/sonner'
 import { useManifestStatus } from '@/hooks/useManifestStatus'
-import { useRef, useEffect, useState } from 'react'
 
 interface ManifestResult {
   header: string
@@ -20,7 +20,7 @@ interface FarcasterToastManagerProps {
   }) => React.ReactNode
 }
 
-export default function FarcasterToastManager({ children }: FarcasterToastManagerProps): JSX.Element {
+export default function FarcasterToastManager({ children }: FarcasterToastManagerProps): React.ReactElement {
   const { isSigned, isLoading, refetch } = useManifestStatus()
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [copySucceeded, setCopySucceeded] = useState(false)
