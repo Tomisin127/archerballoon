@@ -133,8 +133,9 @@ async function handleRequest(request: Request) {
     const json = await response.json()
     return NextResponse.json(json)
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return NextResponse.json(
-      { error: 'Failed to fetch external API', details: error.message },
+      { error: 'Failed to fetch external API', details: errorMessage },
       { status: 500 },
     )
   }
