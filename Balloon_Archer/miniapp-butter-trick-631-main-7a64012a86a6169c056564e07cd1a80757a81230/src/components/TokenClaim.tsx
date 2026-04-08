@@ -5,16 +5,13 @@ import { useState, useEffect } from 'react';
 import { useAccount, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
 import { parseUnits, encodeFunctionData, type Address, type Hex } from 'viem';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Wallet, Trophy, Loader2, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Wallet, Trophy, Loader2, CheckCircle2, XCircle, Target, Sparkles } from 'lucide-react';
 import { appendBaseBuilderAttribution } from '@/utils/baseBuilderAttribution';
 
-// Updated ABI matching the actual contract: mint(uint256 amount) - anyone can mint
 const BALLOONS_TOKEN_ABI = [
   {
-    inputs: [
-      { name: 'amount', type: 'uint256' }
-    ],
+    inputs: [{ name: 'amount', type: 'uint256' }],
     name: 'mint',
     outputs: [],
     stateMutability: 'payable',
@@ -22,10 +19,7 @@ const BALLOONS_TOKEN_ABI = [
   },
 ] as const;
 
-// Contract address for $BALLOONS token on Base network
 const BALLOONS_TOKEN_ADDRESS: Address = '0xBE0B122499C5685B7582730488881562f1aA2a7A';
-
-// Base Builder code for transaction tracking
 const BASE_BUILDER_CODE = 'bc_qau7xvtg';
 
 interface TokenClaimProps {
@@ -53,14 +47,13 @@ export function TokenClaim({ score, onClose }: TokenClaimProps): React.ReactElem
   useEffect(() => {
     if (writeError) {
       const errorMsg = writeError.message.toLowerCase();
-      console.error('Write contract error:', writeError);
       
       if (errorMsg.includes('insufficient funds') || errorMsg.includes('insufficient balance')) {
-        setErrorMessage('⚠️ Insufficient ETH for gas fees. You need Base ETH to pay for the transaction. Please add some ETH to your wallet.');
+        setErrorMessage('Insufficient ETH for gas fees. Add Base ETH to your wallet.');
       } else if (errorMsg.includes('max supply exceeded')) {
-        setErrorMessage('⚠️ Token max supply reached. No more tokens can be minted.');
+        setErrorMessage('Token max supply reached.');
       } else if (errorMsg.includes('user rejected') || errorMsg.includes('user denied')) {
-        setErrorMessage('Transaction was rejected. Please try again and approve the transaction.');
+        setErrorMessage('Transaction rejected. Try again.');
       } else {
         setErrorMessage(writeError.message);
       }
@@ -71,7 +64,7 @@ export function TokenClaim({ score, onClose }: TokenClaimProps): React.ReactElem
 
   const handleClaim = async (): Promise<void> => {
     if (!address || !isConnected) {
-      setErrorMessage('Please connect your wallet first');
+      setErrorMessage('Connect your wallet first');
       setClaimStatus('error');
       return;
     }
@@ -80,44 +73,29 @@ export function TokenClaim({ score, onClose }: TokenClaimProps): React.ReactElem
       setClaimStatus('claiming');
       setErrorMessage('');
 
-      // Convert score to token amount (1 score = 1 token with 18 decimals)
       const tokenAmount = parseUnits(score.toString(), 18);
 
-      // Encode the mint function call
       const mintData = encodeFunctionData({
         abi: BALLOONS_TOKEN_ABI,
         functionName: 'mint',
         args: [tokenAmount],
       }) as Hex;
 
-      // Append Base Builder attribution to transaction data
       const dataWithAttribution = appendBaseBuilderAttribution(mintData, BASE_BUILDER_CODE);
 
-      console.log('Claiming tokens with Base Builder attribution:', {
-        caller: address,
-        amount: tokenAmount.toString(),
-        contract: BALLOONS_TOKEN_ADDRESS,
-        builderCode: BASE_BUILDER_CODE,
-        originalData: mintData,
-        dataWithAttribution: dataWithAttribution
-      });
-
-      // Send transaction with attribution + 1 wei to make it trackable by Base Builder
       sendTransaction({
         to: BALLOONS_TOKEN_ADDRESS,
         data: dataWithAttribution,
-        value: BigInt(1), // 1 wei = 0.000000000000000001 ETH
+        value: BigInt(1),
       });
 
     } catch (error) {
-      console.error('Token claim error:', error);
       const errorMsg = error instanceof Error ? error.message : 'Failed to claim tokens';
       
-      // Better error detection
       if (errorMsg.toLowerCase().includes('insufficient funds')) {
-        setErrorMessage('⚠️ Insufficient ETH for gas fees. Please add some ETH to your wallet on Base network.');
+        setErrorMessage('Insufficient ETH for gas fees.');
       } else if (errorMsg.toLowerCase().includes('max supply exceeded')) {
-        setErrorMessage('⚠️ Token max supply reached. No more tokens can be minted.');
+        setErrorMessage('Token max supply reached.');
       } else {
         setErrorMessage(errorMsg);
       }
@@ -130,80 +108,90 @@ export function TokenClaim({ score, onClose }: TokenClaimProps): React.ReactElem
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
-      <Card className="w-full max-w-md border-2 border-blue-500/50 bg-gradient-to-br from-gray-900 to-gray-800 shadow-2xl">
-        <CardHeader className="text-center space-y-2">
-          <div className="flex justify-center mb-2">
-            <Trophy className="w-16 h-16 text-yellow-400" />
+      <Card className="w-full max-w-md game-card-highlight border-amber-500/30 relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute top-0 right-0 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-40 h-40 bg-orange-500/10 rounded-full blur-3xl" />
+
+        <CardHeader className="text-center relative pb-2">
+          <div className="flex justify-center mb-4">
+            <div className="relative">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
+                <Trophy className="w-10 h-10 text-white" />
+              </div>
+              <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center animate-pulse">
+                <Sparkles className="w-4 h-4 text-white" />
+              </div>
+            </div>
           </div>
-          <CardTitle className="text-3xl font-bold text-white">Game Over!</CardTitle>
-          <CardDescription className="text-lg text-gray-300">
-            Final Score: <span className="text-yellow-400 font-bold text-2xl">{score}</span>
-          </CardDescription>
+          <CardTitle className="text-3xl font-bold text-white game-text-glow">Game Over!</CardTitle>
+          <div className="mt-4 p-4 rounded-2xl bg-slate-800/50 border border-slate-700/50">
+            <p className="text-sm text-slate-400 mb-1">Final Score</p>
+            <p className="text-4xl font-bold text-amber-400">{Math.floor(score)}</p>
+          </div>
         </CardHeader>
         
-        <CardContent className="space-y-4">
-
-
+        <CardContent className="space-y-4 relative pt-0">
           {!isConnected ? (
-            <div className="text-center space-y-4">
-              <p className="text-gray-300">
-                Connect your wallet to claim <span className="text-green-400 font-bold">{score} $BALLOONS</span> tokens!
+            <div className="text-center space-y-4 py-4">
+              <p className="text-slate-300">
+                Connect your wallet to claim <span className="text-emerald-400 font-bold">{Math.floor(score)} $BALLOONS</span>
               </p>
-              <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
+              <div className="flex items-center justify-center gap-2 text-sm text-slate-500">
                 <Wallet className="w-4 h-4" />
-                <span>Use the wallet button in the top navigation</span>
+                <span>Use the wallet button above</span>
               </div>
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-400">Wallet:</span>
-                  <span className="text-white font-mono text-sm">
+              <div className="game-card p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-slate-400 text-sm">Connected Wallet</span>
+                  <span className="text-white font-mono text-sm bg-slate-700/50 px-2 py-1 rounded-lg">
                     {address?.slice(0, 6)}...{address?.slice(-4)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-400">Claiming:</span>
-                  <span className="text-green-400 font-bold">{score} $BALLOONS</span>
+                  <span className="text-slate-400 text-sm">Tokens to Claim</span>
+                  <span className="text-emerald-400 font-bold text-lg">{Math.floor(score)} $BALLOONS</span>
                 </div>
               </div>
 
               {claimStatus === 'idle' && (
                 <Button 
                   onClick={handleClaim}
-                  className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-6 text-lg"
+                  className="w-full h-14 text-lg font-bold game-button-accent"
                   disabled={isProcessing}
                 >
-                  <Trophy className="w-5 h-5 mr-2" />
-                  Claim $BALLOONS Tokens
+                  <Target className="w-5 h-5 mr-2" />
+                  Claim Tokens
                 </Button>
               )}
 
               {isProcessing && (
-                <div className="flex items-center justify-center gap-3 text-blue-400 py-4">
+                <div className="flex items-center justify-center gap-3 text-orange-400 py-4">
                   <Loader2 className="w-6 h-6 animate-spin" />
                   <span className="font-medium">
-                    {isWritePending ? 'Preparing transaction...' : 'Confirming on blockchain...'}
+                    {isWritePending ? 'Confirm in wallet...' : 'Processing...'}
                   </span>
                 </div>
               )}
 
               {claimStatus === 'success' && (
-                <div className="flex items-center justify-center gap-3 text-green-400 py-4">
+                <div className="flex items-center justify-center gap-3 text-emerald-400 py-4">
                   <CheckCircle2 className="w-6 h-6" />
                   <span className="font-medium">Tokens claimed successfully!</span>
                 </div>
               )}
 
               {claimStatus === 'error' && (
-                <div className="space-y-2">
-                  <div className="flex items-center justify-center gap-3 text-red-400 py-2">
-                    <XCircle className="w-6 h-6" />
+                <div className="space-y-3">
+                  <div className="flex items-center justify-center gap-2 text-rose-400 py-2">
+                    <XCircle className="w-5 h-5" />
                     <span className="font-medium">Claim failed</span>
                   </div>
                   {errorMessage && (
-                    <p className="text-sm text-red-300 text-center bg-red-900/20 rounded p-3 border border-red-500/30">
+                    <p className="text-sm text-rose-300 text-center bg-rose-900/20 rounded-xl p-3 border border-rose-500/30">
                       {errorMessage}
                     </p>
                   )}
@@ -211,7 +199,7 @@ export function TokenClaim({ score, onClose }: TokenClaimProps): React.ReactElem
                     <Button 
                       onClick={handleClaim}
                       variant="outline"
-                      className="w-full border-red-500 text-red-400 hover:bg-red-500/10"
+                      className="w-full border-rose-500/30 text-rose-400 hover:bg-rose-500/10"
                     >
                       Try Again
                     </Button>
@@ -221,20 +209,18 @@ export function TokenClaim({ score, onClose }: TokenClaimProps): React.ReactElem
             </div>
           )}
 
-          <div className="pt-4 border-t border-gray-700">
+          <div className="pt-2">
             <Button 
               onClick={onClose}
-              variant="outline"
-              className="w-full border-gray-600 text-gray-300 hover:bg-gray-700"
+              className="w-full h-12 font-bold game-button-primary"
             >
               {claimStatus === 'success' ? 'Continue' : 'Play Again'}
             </Button>
           </div>
 
-          <div className="text-xs text-gray-500 text-center">
-            <p>Token contract: Base Network</p>
-            <p className="font-mono text-[10px] break-all">{BALLOONS_TOKEN_ADDRESS}</p>
-          </div>
+          <p className="text-xs text-slate-600 text-center">
+            Token: {BALLOONS_TOKEN_ADDRESS.slice(0, 10)}...{BALLOONS_TOKEN_ADDRESS.slice(-8)}
+          </p>
         </CardContent>
       </Card>
     </div>
