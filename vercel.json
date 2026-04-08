@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "installCommand": "pnpm install",
+  "buildCommand": "pnpm build",
+  "devCommand": "pnpm dev",
+  "ignoreCommand": "",
+  "rootDirectory": "Balloon_Archer/miniapp-butter-trick-631-main-7a64012a86a6169c056564e07cd1a80757a81230"
+}
