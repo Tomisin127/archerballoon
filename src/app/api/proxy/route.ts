@@ -38,7 +38,7 @@ export async function DELETE(request: Request) {
 }
 
 async function handleRequest(request: Request) {
-  let parsed
+  let parsed: Record<string, any>
   const wordMap = createSecretMap()
 
   const contentType = request.headers.get('content-type')
