@@ -1,84 +1,69 @@
 'use client'
-import type React, { useEffect } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 import { GameCanvas } from '@/components/GameCanvas';
 import { GameHUD } from '@/components/GameHUD';
 import { GameControls } from '@/components/GameControls';
 import { WalletButton } from '@/components/WalletButton';
 import { TokenClaim } from '@/components/TokenClaim';
-import { AppCoinSwap } from '@/components/AppCoinSwap';
-import { Button } from '@/components/ui/button';
-import { Coins } from 'lucide-react';
+import { SwapModal } from '@/components/SwapModal';
+import { HomeScreen } from '@/components/HomeScreen';
 import { sdk } from "@farcaster/miniapp-sdk";
 import { useAddMiniApp } from "@/hooks/useAddMiniApp";
 import { useQuickAuth } from "@/hooks/useQuickAuth";
 import { useIsInFarcaster } from "@/hooks/useIsInFarcaster";
 
 export default function BowAndArrowGame(): React.ReactElement {
-    const { addMiniApp } = useAddMiniApp();
-    const isInFarcaster = useIsInFarcaster()
-    useQuickAuth(isInFarcaster)
-    useEffect(() => {
-      const tryAddMiniApp = async () => {
-        try {
-          await addMiniApp()
-        } catch (error) {
-          console.error('Failed to add mini app:', error)
-        }
+  const { addMiniApp } = useAddMiniApp();
+  const isInFarcaster = useIsInFarcaster();
+  useQuickAuth(isInFarcaster);
 
-      }
-
-    
-
-      tryAddMiniApp()
-    }, [addMiniApp])
-    useEffect(() => {
-      const initializeFarcaster = async () => {
-        try {
-          await new Promise(resolve => setTimeout(resolve, 100))
-          
-          if (document.readyState !== 'complete') {
-            await new Promise<void>(resolve => {
-              if (document.readyState === 'complete') {
-                resolve()
-              } else {
-                window.addEventListener('load', () => resolve(), { once: true })
-              }
-
-            })
-          }
-
-    
-
-          await sdk.actions.ready()
-          console.log('Farcaster SDK initialized successfully - app fully loaded')
-        } catch (error) {
-          console.error('Failed to initialize Farcaster SDK:', error)
-          
-          setTimeout(async () => {
-            try {
-              await sdk.actions.ready()
-              console.log('Farcaster SDK initialized on retry')
-            } catch (retryError) {
-              console.error('Farcaster SDK retry failed:', retryError)
-            }
-
-          }, 1000)
-        }
-
-      }
-
-    
-
-      initializeFarcaster()
-    }, [])
   const [score, setScore] = useState<number>(0);
   const [wave, setWave] = useState<number>(1);
   const [arrows, setArrows] = useState<number>(5);
   const [combo, setCombo] = useState<number>(0);
-  const [gameState, setGameState] = useState<'playing' | 'gameover' | 'ready'>('ready');
+  const [gameState, setGameState] = useState<'menu' | 'playing' | 'gameover' | 'ready'>('menu');
   const [showTokenClaim, setShowTokenClaim] = useState<boolean>(false);
-  const [showAppCoinSwap, setShowAppCoinSwap] = useState<boolean>(false);
+  const [showSwapModal, setShowSwapModal] = useState<boolean>(false);
+
+  useEffect(() => {
+    const tryAddMiniApp = async () => {
+      try {
+        await addMiniApp();
+      } catch (error) {
+        console.error('Failed to add mini app:', error);
+      }
+    };
+    tryAddMiniApp();
+  }, [addMiniApp]);
+
+  useEffect(() => {
+    const initializeFarcaster = async () => {
+      try {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        if (document.readyState !== 'complete') {
+          await new Promise<void>(resolve => {
+            if (document.readyState === 'complete') {
+              resolve();
+            } else {
+              window.addEventListener('load', () => resolve(), { once: true });
+            }
+          });
+        }
+        await sdk.actions.ready();
+      } catch (error) {
+        console.error('Failed to initialize Farcaster SDK:', error);
+        setTimeout(async () => {
+          try {
+            await sdk.actions.ready();
+          } catch (retryError) {
+            console.error('Farcaster SDK retry failed:', retryError);
+          }
+        }, 1000);
+      }
+    };
+    initializeFarcaster();
+  }, []);
 
   // Show token claim modal when game is over
   useEffect(() => {
@@ -89,40 +74,58 @@ export default function BowAndArrowGame(): React.ReactElement {
 
   const handleCloseTokenClaim = (): void => {
     setShowTokenClaim(false);
-    // Reset game state to ready
-    setGameState('ready');
+    setGameState('menu');
     setScore(0);
     setWave(1);
     setArrows(5);
     setCombo(0);
   };
 
-  return (
-    <main className="relative w-full h-screen overflow-hidden bg-[#1A2A33]">
-      {/* Top Navigation Bar */}
-      <div className="absolute top-4 right-4 z-50">
-        <WalletButton />
-      </div>
+  const handleStartGame = (): void => {
+    setScore(0);
+    setWave(1);
+    setArrows(5);
+    setCombo(0);
+    setGameState('ready');
+  };
 
-      {/* Bottom Right - AppCoin Button */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <Button
-          onClick={() => setShowAppCoinSwap(true)}
-          className="bg-purple-600 hover:bg-purple-700 text-white font-bold shadow-2xl rounded-full px-6 py-6"
-        >
-          <Coins className="w-5 h-5 mr-2" />
-          AppCoin
-        </Button>
-      </div>
+  const handleBackToMenu = (): void => {
+    setGameState('menu');
+    setScore(0);
+    setWave(1);
+    setArrows(5);
+    setCombo(0);
+  };
+
+  // Show home screen when in menu state
+  if (gameState === 'menu') {
+    return (
+      <HomeScreen 
+        onStartGame={handleStartGame}
+        onOpenSwap={() => setShowSwapModal(true)}
+        showSwapModal={showSwapModal}
+        onCloseSwap={() => setShowSwapModal(false)}
+      />
+    );
+  }
+
+  return (
+    <main className="relative w-full h-screen overflow-hidden bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+      {/* Wallet Button */}
+      <WalletButton />
       
+      {/* Game HUD */}
       <GameHUD 
         score={score}
         wave={wave}
         arrows={arrows}
         combo={combo}
         gameState={gameState}
+        onBackToMenu={handleBackToMenu}
+        onOpenSwap={() => setShowSwapModal(true)}
       />
       
+      {/* Game Canvas */}
       <GameCanvas
         score={score}
         setScore={setScore}
@@ -136,8 +139,10 @@ export default function BowAndArrowGame(): React.ReactElement {
         setGameState={setGameState}
       />
 
+      {/* Controls Overlay */}
       <GameControls />
 
+      {/* Token Claim Modal */}
       {showTokenClaim && (
         <TokenClaim 
           score={score} 
@@ -145,9 +150,9 @@ export default function BowAndArrowGame(): React.ReactElement {
         />
       )}
 
-      {/* AppCoin Swap Modal */}
-      {showAppCoinSwap && (
-        <AppCoinSwap onClose={() => setShowAppCoinSwap(false)} />
+      {/* Swap Modal */}
+      {showSwapModal && (
+        <SwapModal onClose={() => setShowSwapModal(false)} />
       )}
     </main>
   );

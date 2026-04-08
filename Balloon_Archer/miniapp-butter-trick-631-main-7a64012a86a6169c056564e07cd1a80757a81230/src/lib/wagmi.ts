@@ -1,44 +1,37 @@
-import { createConfig, http } from 'wagmi';
-import { base, baseSepolia } from 'wagmi/chains';
+import { createConfig, http, cookieStorage, createStorage } from 'wagmi';
+import { base, baseSepolia, mainnet } from 'wagmi/chains';
 import { coinbaseWallet, metaMask, injected } from 'wagmi/connectors';
-import { QueryClient } from '@tanstack/react-query'
 
 const chainId = process.env.NEXT_PUBLIC_SDK_CHAIN_ID
   ? Number(process.env.NEXT_PUBLIC_SDK_CHAIN_ID)
-  : baseSepolia.id
-  
-export const activeChain = chainId === 84532 ? baseSepolia : base
-  
+  : base.id; // Default to Base mainnet for production
+
+export const activeChain = chainId === 84532 ? baseSepolia : base;
+
 export const config = createConfig({
-  chains: [activeChain],
+  chains: [activeChain, mainnet],
   connectors: [
     // Coinbase Wallet - supports both TBA and EOA
     coinbaseWallet({
-      appName: 'Ohara',
+      appName: 'Balloon Archer',
       preference: 'all',
     }),
     // MetaMask
     metaMask({
       dappMetadata: {
-        name: 'Ohara',
+        name: 'Balloon Archer',
       },
     }),
-    injected({ target: 'phantom' }),  
-    injected({ target: 'rabby' }),  
-    injected({ target: 'trust' }),  
+    // Injected wallets
+    injected({ target: 'phantom' }),
+    injected({ target: 'rabby' }),
+    injected({ target: 'trust' }),
   ],
-  transports: {  
+  storage: createStorage({ storage: cookieStorage }),
+  ssr: true,
+  transports: {
     [base.id]: http('https://mainnet.base.org'),
     [baseSepolia.id]: http('https://sepolia.base.org'),
-  }
-});
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      retry: 1,
-      staleTime: 5_000,
-    },
+    [mainnet.id]: http(), // For ENS resolution
   },
 });

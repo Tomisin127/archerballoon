@@ -15,8 +15,8 @@ interface GameCanvasProps {
   setArrows: (value: number | ((prev: number) => number)) => void;
   combo: number;
   setCombo: (value: number | ((prev: number) => number)) => void;
-  gameState: 'playing' | 'gameover' | 'ready';
-  setGameState: (value: 'playing' | 'gameover' | 'ready') => void;
+  gameState: 'menu' | 'playing' | 'gameover' | 'ready';
+  setGameState: (value: 'menu' | 'playing' | 'gameover' | 'ready') => void;
 }
 
 export function GameCanvas({
