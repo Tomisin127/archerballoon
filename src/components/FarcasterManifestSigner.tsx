@@ -20,7 +20,7 @@ export default function FarcasterManifestSigner({
   domain = 'butter-trick-631.app.ohara.ai',
   onSuccess,
   onError
-}: FarcasterAutoManifestSignerProps): JSX.Element | null {
+}: FarcasterAutoManifestSignerProps): React.ReactNode {
   const [isMiniApp, setIsMiniApp] = useState<boolean>(false)
   const [isCheckingEnvironment, setIsCheckingEnvironment] = useState<boolean>(true)
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
