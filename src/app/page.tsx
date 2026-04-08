@@ -17,6 +17,7 @@ export default function BowAndArrowGame(): React.ReactElement {
   const { addMiniApp } = useAddMiniApp();
   const isInFarcaster = useIsInFarcaster();
   useQuickAuth(isInFarcaster);
+  
 
   const [score, setScore] = useState<number>(0);
   const [wave, setWave] = useState<number>(1);
