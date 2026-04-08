@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 
 const FarcasterToastManager = dynamic(() => import('./FarcasterToastManager'), {
@@ -17,7 +17,7 @@ interface FarcasterWrapperProps {
   children: React.ReactNode
 }
 
-export default function FarcasterWrapper({ children }: FarcasterWrapperProps): JSX.Element {
+export default function FarcasterWrapper({ children }: FarcasterWrapperProps): React.ReactElement {
   const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
