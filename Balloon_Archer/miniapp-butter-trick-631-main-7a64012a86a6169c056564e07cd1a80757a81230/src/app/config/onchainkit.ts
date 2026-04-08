@@ -1,0 +1,2 @@
+export const ONCHAINKIT_API_KEY = process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY || 'W0e6Wr_oKrZLf9rXhGJpkG_s8nG3aU6L';
+export const ONCHAINKIT_PROJECT_ID = process.env.NEXT_PUBLIC_CDP_PROJECT_ID || '2c62e2ee-0c56-4f0b-b56d-ee8ab64835d8';
