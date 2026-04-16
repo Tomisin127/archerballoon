@@ -20,7 +20,7 @@ const BALLOONS_TOKEN_ABI = [
 ] as const;
 
 const BALLOONS_TOKEN_ADDRESS: Address = '0xBE0B122499C5685B7582730488881562f1aA2a7A';
-const BASE_BUILDER_CODE = 'bc_qau7xvtg';
+
 
 interface TokenClaimProps {
   score: number;
@@ -81,7 +81,7 @@ export function TokenClaim({ score, onClose }: TokenClaimProps): React.ReactElem
         args: [tokenAmount],
       }) as Hex;
 
-      const dataWithAttribution = appendBaseBuilderAttribution(mintData, BASE_BUILDER_CODE);
+      const dataWithAttribution = appendBaseBuilderAttribution(mintData);
 
       sendTransaction({
         to: BALLOONS_TOKEN_ADDRESS,

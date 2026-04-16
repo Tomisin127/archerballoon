@@ -27,6 +27,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { appendBaseBuilderAttribution } from '@/utils/baseBuilderAttribution';
 
 // Contract addresses on Base
 const TOKEN_ADDRESS: Address = '0x875eC94874201fcFbe1ba2efEB1c2b21D39118E8';
@@ -379,7 +380,7 @@ export function SwapModal({ onClose }: SwapModalProps): React.ReactElement {
 
         sendTransaction({
           to: UNISWAP_V3_ROUTER,
-          data: multicallData,
+          data: appendBaseBuilderAttribution(multicallData),
           value: amountIn,
         });
       } else {
@@ -412,7 +413,7 @@ export function SwapModal({ onClose }: SwapModalProps): React.ReactElement {
 
         sendTransaction({
           to: UNISWAP_V3_ROUTER,
-          data: multicallData,
+          data: appendBaseBuilderAttribution(multicallData),
         });
       }
     } catch (err) {
