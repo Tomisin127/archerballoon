@@ -111,7 +111,7 @@ export default function BowAndArrowGame(): React.ReactElement {
   }
 
   return (
-    <main className="relative w-full h-screen overflow-hidden bg-gradient-to-b from-sky-600 via-sky-400 to-orange-300">
+    <main className="relative w-full h-screen overflow-hidden sky-backdrop">
       {/* Wallet Button */}
       <WalletButton />
       

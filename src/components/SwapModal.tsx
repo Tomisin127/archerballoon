@@ -454,31 +454,36 @@ export function SwapModal({ onClose }: SwapModalProps): React.ReactElement {
   const hasInsufficientBalance = inputAmount && parseFloat(inputAmount) > parseFloat(inputBalance);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
-      <Card className="w-full max-w-md game-card-highlight border-emerald-500/30 relative overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl" />
-        
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md px-4 animate-in fade-in duration-200">
+      <Card className="w-full max-w-md game-card-highlight border-emerald-500/40 relative overflow-hidden">
+        {/* Vibrant background decoration */}
+        <div className="absolute -top-16 -right-16 w-48 h-48 bg-gradient-to-br from-emerald-400/30 to-teal-500/20 rounded-full blur-3xl" />
+        <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-gradient-to-br from-orange-400/25 to-rose-500/15 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-sky-500/5 to-transparent rounded-full blur-3xl" />
+
         {/* Close Button */}
         <Button
           onClick={onClose}
           variant="ghost"
           size="icon"
-          className="absolute top-4 right-4 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-xl z-10"
+          className="absolute top-4 right-4 text-slate-300 hover:text-white hover:bg-slate-700/60 rounded-xl z-10 border border-slate-700/50"
         >
           <X className="w-5 h-5" />
         </Button>
 
-        <CardHeader className="pb-4 pr-12 relative">
-          <CardTitle className="text-2xl font-bold text-white flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
-              <ArrowDownUp className="w-5 h-5 text-white" />
+        <CardHeader className="pb-4 pr-14 relative">
+          <CardTitle className="text-2xl font-black text-white flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl tile-gradient-emerald flex items-center justify-center relative">
+              <ArrowDownUp className="w-6 h-6 text-white" />
+              <div className="absolute inset-0 rounded-2xl border-t border-white/40" />
             </div>
-            Swap $BALLOON
+            <span>
+              Swap{' '}
+              <span className="game-text-gradient-emerald">$BALLOON</span>
+            </span>
           </CardTitle>
-          <p className="text-slate-400 text-sm mt-1">
-            Trade on Uniswap V3 (Base Network)
+          <p className="text-slate-300 text-sm mt-2 font-medium">
+            Trade on Uniswap V3 • Base Network
           </p>
         </CardHeader>
 
@@ -491,13 +496,17 @@ export function SwapModal({ onClose }: SwapModalProps): React.ReactElement {
           ) : (
             <>
               {/* Input Section */}
-              <div className="game-card p-4 space-y-2">
+              <div className="game-card p-4 space-y-2 border-slate-700/60">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-400">
+                  <span className="text-slate-300 font-semibold uppercase text-[11px] tracking-widest">
                     {isBuying ? 'You pay' : 'You sell'}
                   </span>
-                  <span className="text-slate-500 text-xs">
-                    Balance: {parseFloat(inputBalance).toFixed(4)} {isBuying ? 'ETH' : 'BALLOON'}
+                  <span className="text-slate-400 text-xs font-medium">
+                    Balance:{' '}
+                    <span className="text-slate-200 tabular-nums">
+                      {parseFloat(inputBalance).toFixed(4)}
+                    </span>{' '}
+                    {isBuying ? 'ETH' : 'BALLOON'}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -506,18 +515,23 @@ export function SwapModal({ onClose }: SwapModalProps): React.ReactElement {
                     placeholder="0.0"
                     value={inputAmount}
                     onChange={(e) => setInputAmount(e.target.value)}
-                    className="game-input text-xl font-bold h-14 flex-1"
+                    className="game-input text-2xl font-black h-14 flex-1 tabular-nums"
                   />
                   <Button
                     onClick={handleMaxClick}
-                    variant="ghost"
                     size="sm"
-                    className="text-orange-400 hover:text-orange-300 hover:bg-orange-500/10"
+                    className="text-orange-300 hover:text-orange-200 hover:bg-orange-500/20 bg-orange-500/10 border border-orange-500/30 font-black text-xs"
                   >
                     MAX
                   </Button>
-                  <div className="px-3 py-2 bg-slate-700/50 rounded-xl text-white font-bold">
-                    {isBuying ? 'ETH' : 'BALLOON'}
+                  <div
+                    className={`px-3 py-2.5 rounded-xl text-white font-black text-sm flex items-center gap-1.5 border ${
+                      isBuying
+                        ? 'bg-gradient-to-br from-sky-500/30 to-blue-600/30 border-sky-400/40'
+                        : 'bg-gradient-to-br from-orange-500/30 to-rose-500/30 border-orange-400/40'
+                    }`}
+                  >
+                    {isBuying ? 'ETH' : '🎈 BALLOON'}
                   </div>
                 </div>
               </div>
@@ -528,47 +542,63 @@ export function SwapModal({ onClose }: SwapModalProps): React.ReactElement {
                   onClick={toggleDirection}
                   variant="ghost"
                   size="icon"
-                  className="w-10 h-10 rounded-full bg-slate-800 border-2 border-slate-700 hover:border-orange-500 hover:bg-slate-700 transition-all"
+                  className="w-11 h-11 rounded-full bg-slate-900 border-2 border-orange-500/50 hover:border-orange-400 hover:bg-slate-800 transition-all shadow-lg shadow-orange-500/20 active:scale-90"
+                  aria-label="Swap direction"
                 >
                   <ArrowDownUp className="w-4 h-4 text-orange-400" />
                 </Button>
               </div>
 
               {/* Output Section */}
-              <div className="game-card p-4 space-y-2">
+              <div className="game-card p-4 space-y-2 border-emerald-500/20">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-400">
+                  <span className="text-slate-300 font-semibold uppercase text-[11px] tracking-widest">
                     {isBuying ? 'You receive' : 'You get'}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="flex-1 h-14 flex items-center px-4 bg-slate-800/50 rounded-xl">
+                  <div className="flex-1 h-14 flex items-center px-4 bg-slate-950/60 rounded-xl border border-slate-700/50">
                     {isQuoting ? (
-                      <Loader2 className="w-5 h-5 animate-spin text-slate-500" />
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="w-5 h-5 animate-spin text-emerald-400" />
+                        <span className="text-slate-400 text-sm">Fetching quote...</span>
+                      </div>
                     ) : (
-                      <span className={`text-xl font-bold ${outputAmount ? 'text-white' : 'text-slate-500'}`}>
+                      <span
+                        className={`text-2xl font-black tabular-nums ${
+                          outputAmount ? 'text-emerald-300' : 'text-slate-500'
+                        }`}
+                      >
                         {outputAmount ? parseFloat(outputAmount).toFixed(6) : '0.0'}
                       </span>
                     )}
                   </div>
-                  <div className="px-3 py-2 bg-slate-700/50 rounded-xl text-white font-bold">
-                    {isBuying ? 'BALLOON' : 'ETH'}
+                  <div
+                    className={`px-3 py-2.5 rounded-xl text-white font-black text-sm flex items-center gap-1.5 border ${
+                      isBuying
+                        ? 'bg-gradient-to-br from-orange-500/30 to-rose-500/30 border-orange-400/40'
+                        : 'bg-gradient-to-br from-sky-500/30 to-blue-600/30 border-sky-400/40'
+                    }`}
+                  >
+                    {isBuying ? '🎈 BALLOON' : 'ETH'}
                   </div>
                 </div>
               </div>
 
               {/* Slippage */}
-              <div className="flex items-center justify-between text-sm text-slate-400 px-1">
-                <span>Slippage tolerance</span>
-                <div className="flex items-center gap-1">
+              <div className="flex items-center justify-between text-sm text-slate-300 px-1">
+                <span className="font-semibold uppercase text-[11px] tracking-widest">
+                  Slippage tolerance
+                </span>
+                <div className="flex items-center gap-1.5">
                   {[1, 3, 5].map((s) => (
                     <button
                       key={s}
                       onClick={() => setSlippage(s)}
-                      className={`px-2 py-1 rounded-lg text-xs font-medium transition-colors ${
+                      className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all ${
                         slippage === s
-                          ? 'bg-orange-500/20 text-orange-400'
-                          : 'bg-slate-700/50 text-slate-400 hover:text-white'
+                          ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/30 scale-105'
+                          : 'bg-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-700 border border-slate-700/50'
                       }`}
                     >
                       {s}%

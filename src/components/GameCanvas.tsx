@@ -39,11 +39,12 @@ export function GameCanvas({
   const startPosRef = useRef<{ x: number; y: number } | null>(null);
   const currentPosRef = useRef<{ x: number; y: number } | null>(null);
   const animationFrameRef = useRef<number>(0);
+  // Logical (CSS) dimensions and device pixel ratio for HiDPI rendering
+  const dimsRef = useRef<{ w: number; h: number; dpr: number }>({ w: 0, h: 0, dpr: 1 });
 
   // Reset game when returning to 'ready' state
   useEffect(() => {
     if (gameState === 'ready') {
-      // Clear all game objects
       arrowsRef.current = [];
       balloonsRef.current = [];
       particlesRef.current = [];
@@ -58,21 +59,31 @@ export function GameCanvas({
     if (!canvas) return;
 
     const resizeCanvas = (): void => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      
-      // Initialize balloons when canvas is ready
+      // Use device pixel ratio so strokes, gradients, and text render at native sharpness
+      const dpr = Math.max(1, window.devicePixelRatio || 1);
+      const cssW = window.innerWidth;
+      const cssH = window.innerHeight;
+
+      canvas.width = Math.floor(cssW * dpr);
+      canvas.height = Math.floor(cssH * dpr);
+      canvas.style.width = `${cssW}px`;
+      canvas.style.height = `${cssH}px`;
+      dimsRef.current = { w: cssW, h: cssH, dpr };
+
+      // Initialize balloons when canvas is ready (using logical size)
       if (balloonsRef.current.length === 0 && gameState === 'ready') {
-        balloonsRef.current = createBalloons(wave, canvas.width, canvas.height);
+        balloonsRef.current = createBalloons(wave, cssW, cssH);
         setGameState('playing');
       }
     };
 
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('orientationchange', resizeCanvas);
 
     return () => {
       window.removeEventListener('resize', resizeCanvas);
+      window.removeEventListener('orientationchange', resizeCanvas);
     };
   }, [wave, gameState, setGameState]);
 
@@ -84,9 +95,21 @@ export function GameCanvas({
     if (!ctx) return;
 
     const gameLoop = (): void => {
+      const { w, h, dpr } = dimsRef.current;
+      if (w === 0 || h === 0) {
+        animationFrameRef.current = requestAnimationFrame(gameLoop);
+        return;
+      }
+
+      // Scale the context so all drawing uses CSS pixels
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      // Enable smoothing for crisp gradients
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+
       // Update
-      updateArrows(arrowsRef.current, canvas.width, canvas.height);
-      updateBalloons(balloonsRef.current);
+      updateArrows(arrowsRef.current, w, h);
+      updateBalloons(balloonsRef.current, w);
       updateParticles(particlesRef.current);
 
       // Check collisions
@@ -108,7 +131,6 @@ export function GameCanvas({
         setScore((prev: number) => prev + (100 * poppedBalloons * multiplier));
       }
 
-      // Reset combo if arrow missed
       if (hitArrows === 0 && arrowsRef.current.length === 0 && !aimingRef.current) {
         if (combo > 0) {
           setCombo(0);
@@ -118,8 +140,8 @@ export function GameCanvas({
       // Draw
       drawGame(
         ctx,
-        canvas.width,
-        canvas.height,
+        w,
+        h,
         arrowsRef.current,
         balloonsRef.current,
         particlesRef.current,
@@ -129,14 +151,13 @@ export function GameCanvas({
         combo
       );
 
-      // Check win/lose conditions
+      // Win/lose conditions
       if (balloonsRef.current.length === 0 && gameState === 'playing') {
-        // Wave complete
         soundEngine.playWaveComplete();
         const newWave = wave + 1;
         setWave(newWave);
         setArrows(5);
-        balloonsRef.current = createBalloons(newWave, canvas.width, canvas.height);
+        balloonsRef.current = createBalloons(newWave, w, h);
       }
 
       if (arrows === 0 && arrowsRef.current.length === 0 && balloonsRef.current.length > 0 && gameState === 'playing') {
@@ -166,8 +187,8 @@ export function GameCanvas({
       const rect = canvas.getBoundingClientRect();
       const y = e.clientY - rect.top;
 
-      // Only allow aiming from bottom 50% of screen
-      if (y > canvas.height * 0.5) {
+      // Only allow aiming from bottom 50% of screen (use CSS rect, not canvas backing store)
+      if (y > rect.height * 0.5) {
         aimingRef.current = true;
         startPosRef.current = {
           x: e.clientX - rect.left,
@@ -187,14 +208,13 @@ export function GameCanvas({
       };
     };
 
-    const handlePointerUp = (e: PointerEvent): void => {
+    const handlePointerUp = (): void => {
       if (!aimingRef.current || !startPosRef.current || !currentPosRef.current) return;
 
       const dx = currentPosRef.current.x - startPosRef.current.x;
       const dy = currentPosRef.current.y - startPosRef.current.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
-      // Deadzone check
       if (distance > 15 && arrows > 0) {
         const angle = Math.atan2(-dy, -dx);
         const power = Math.min(distance / 250, 1.0);
@@ -203,10 +223,11 @@ export function GameCanvas({
         const velocityY = Math.sin(angle) * (10 + power * 20);
 
         soundEngine.playShoot();
-        
+
+        const { w, h } = dimsRef.current;
         arrowsRef.current.push({
-          x: canvas.width / 2,
-          y: canvas.height - 100,
+          x: w / 2,
+          y: h - 100,
           vx: velocityX,
           vy: velocityY,
           rotation: angle,

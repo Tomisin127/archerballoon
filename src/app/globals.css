@@ -1,146 +1,255 @@
 @import "tailwindcss";
 
-/* Balloon Archer Game Theme - Vibrant Sky Blue & Coral/Orange accents */
+/* Balloon Archer Game Theme - Vibrant tropical palette */
 @theme inline {
-  --color-background: hsl(200 50% 12%);
+  --color-background: hsl(222 47% 11%);
   --color-foreground: hsl(0 0% 98%);
-  --color-card: hsl(210 40% 15%);
+  --color-card: hsl(222 40% 14%);
   --color-card-foreground: hsl(0 0% 98%);
-  --color-popover: hsl(210 40% 12%);
+  --color-popover: hsl(222 40% 12%);
   --color-popover-foreground: hsl(0 0% 98%);
-  --color-primary: hsl(16 85% 55%);
+  --color-primary: hsl(16 90% 55%);
   --color-primary-foreground: hsl(0 0% 100%);
-  --color-secondary: hsl(160 70% 40%);
+  --color-secondary: hsl(160 75% 42%);
   --color-secondary-foreground: hsl(0 0% 100%);
-  --color-muted: hsl(210 30% 20%);
+  --color-muted: hsl(222 30% 20%);
   --color-muted-foreground: hsl(210 20% 65%);
   --color-accent: hsl(45 95% 55%);
-  --color-accent-foreground: hsl(210 40% 10%);
+  --color-accent-foreground: hsl(222 47% 11%);
   --color-destructive: hsl(0 75% 55%);
   --color-destructive-foreground: hsl(0 0% 98%);
-  --color-border: hsl(210 30% 25%);
-  --color-input: hsl(210 30% 22%);
-  --color-ring: hsl(16 85% 55%);
-  --radius-lg: 0.75rem;
-  --radius-md: calc(0.75rem - 2px);
-  --radius-sm: calc(0.75rem - 4px);
+  --color-border: hsl(222 30% 25%);
+  --color-input: hsl(222 30% 22%);
+  --color-ring: hsl(16 90% 55%);
+  --radius-lg: 1rem;
+  --radius-md: calc(1rem - 2px);
+  --radius-sm: calc(1rem - 4px);
   --font-sans: system-ui, -apple-system, sans-serif;
   --font-mono: ui-monospace, 'Cascadia Code', monospace;
 }
 
 @keyframes accordion-down {
-  from {
-    height: 0;
-  }
-  to {
-    height: var(--radix-accordion-content-height);
-  }
+  from { height: 0; }
+  to { height: var(--radix-accordion-content-height); }
 }
 
 @keyframes accordion-up {
-  from {
-    height: var(--radix-accordion-content-height);
-  }
-  to {
-    height: 0;
-  }
+  from { height: var(--radix-accordion-content-height); }
+  to { height: 0; }
 }
 
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-14px) rotate(1deg); }
+}
+
+@keyframes float-medium {
+  0%, 100% { transform: translateY(0) rotate(1deg); }
+  50% { transform: translateY(-10px) rotate(-1deg); }
+}
+
+@keyframes float-fast {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
 
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 10px rgba(234, 88, 12, 0.3);
+    box-shadow: 0 0 18px rgba(234, 88, 12, 0.5), 0 0 36px rgba(234, 88, 12, 0.25);
   }
   50% {
-    box-shadow: 0 0 25px rgba(234, 88, 12, 0.6);
+    box-shadow: 0 0 30px rgba(234, 88, 12, 0.75), 0 0 60px rgba(234, 88, 12, 0.4);
+  }
+}
+
+@keyframes pulse-glow-emerald {
+  0%, 100% {
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.45), 0 0 28px rgba(16, 185, 129, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 22px rgba(16, 185, 129, 0.65), 0 0 44px rgba(16, 185, 129, 0.35);
   }
 }
 
 @keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes confetti-fall {
+  0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 @layer base {
+  html {
+    background-color: hsl(222 47% 11%);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
   body {
-    background-color: hsl(200 50% 12%);
+    background-color: hsl(222 47% 11%);
     color: hsl(0 0% 98%);
   }
 }
 
 @layer components {
-  /* Game-themed button styles */
+  /* Game-themed buttons with stronger depth and shine */
   .game-button-primary {
-    @apply bg-gradient-to-b from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 
-           text-white font-bold rounded-xl shadow-lg 
-           border-2 border-orange-400/50
-           transition-all duration-200 active:scale-95;
+    @apply relative overflow-hidden
+           bg-gradient-to-b from-orange-400 via-orange-500 to-orange-600
+           hover:from-orange-300 hover:via-orange-400 hover:to-orange-500
+           text-white font-bold rounded-2xl shadow-lg shadow-orange-600/40
+           border border-orange-300/40
+           transition-all duration-200 active:scale-[0.97] active:shadow-md;
   }
-  
+  .game-button-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
   .game-button-secondary {
-    @apply bg-gradient-to-b from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 
-           text-white font-bold rounded-xl shadow-lg 
-           border-2 border-emerald-400/50
-           transition-all duration-200 active:scale-95;
+    @apply relative overflow-hidden
+           bg-gradient-to-b from-emerald-400 via-emerald-500 to-emerald-600
+           hover:from-emerald-300 hover:via-emerald-400 hover:to-emerald-500
+           text-white font-bold rounded-2xl shadow-lg shadow-emerald-600/40
+           border border-emerald-300/40
+           transition-all duration-200 active:scale-[0.97] active:shadow-md;
   }
-  
+  .game-button-secondary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
   .game-button-accent {
-    @apply bg-gradient-to-b from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 
-           text-slate-900 font-bold rounded-xl shadow-lg 
-           border-2 border-amber-300/50
-           transition-all duration-200 active:scale-95;
+    @apply relative overflow-hidden
+           bg-gradient-to-b from-amber-300 via-amber-400 to-amber-500
+           hover:from-amber-200 hover:via-amber-300 hover:to-amber-400
+           text-slate-900 font-bold rounded-2xl shadow-lg shadow-amber-500/40
+           border border-amber-200/50
+           transition-all duration-200 active:scale-[0.97] active:shadow-md;
   }
-  
+  .game-button-accent::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  /* Cards — punchier with inner highlight */
   .game-card {
-    @apply bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-700/50 
-           shadow-xl shadow-black/20;
+    @apply relative bg-slate-900/80 backdrop-blur-xl rounded-2xl
+           border border-slate-700/60 shadow-xl shadow-black/40;
   }
-  
+  .game-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
   .game-card-highlight {
-    @apply bg-gradient-to-br from-slate-800/95 to-slate-900/95 backdrop-blur-md rounded-2xl 
-           border border-orange-500/30 shadow-xl shadow-orange-500/10;
+    @apply relative bg-gradient-to-br from-slate-900/95 via-slate-900/90 to-slate-800/95
+           backdrop-blur-xl rounded-3xl
+           border border-orange-500/40 shadow-2xl shadow-orange-500/20;
   }
-  
+  .game-card-highlight::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  /* Vibrant gradient tile for feature icons */
+  .tile-gradient-orange {
+    @apply bg-gradient-to-br from-orange-400 via-orange-500 to-rose-500
+           shadow-lg shadow-orange-500/40;
+  }
+  .tile-gradient-emerald {
+    @apply bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-600
+           shadow-lg shadow-emerald-500/40;
+  }
+  .tile-gradient-amber {
+    @apply bg-gradient-to-br from-amber-300 via-amber-400 to-orange-500
+           shadow-lg shadow-amber-500/40;
+  }
+  .tile-gradient-sky {
+    @apply bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600
+           shadow-lg shadow-sky-500/40;
+  }
+
   .game-text-glow {
-    text-shadow: 0 0 10px rgba(234, 88, 12, 0.5), 0 0 20px rgba(234, 88, 12, 0.3);
+    text-shadow:
+      0 0 12px rgba(251, 146, 60, 0.55),
+      0 0 24px rgba(251, 146, 60, 0.35),
+      0 2px 6px rgba(0, 0, 0, 0.6);
   }
-  
+
+  .game-text-gradient {
+    background: linear-gradient(135deg, #FFC300 0%, #FF6B35 50%, #FF3355 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  .game-text-gradient-emerald {
+    background: linear-gradient(135deg, #34D399 0%, #10B981 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
   .game-input {
-    @apply bg-slate-800/80 border-2 border-slate-600/50 rounded-xl 
-           focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 
+    @apply bg-slate-800/90 border-2 border-slate-700/60 rounded-xl
+           focus:border-orange-500/70 focus:ring-2 focus:ring-orange-500/30
            text-white placeholder:text-slate-500 transition-all;
   }
-  
-  /* Floating animation for game elements */
-  .animate-float {
-    animation: float 3s ease-in-out infinite;
+
+  /* Sunset sky backdrop (used on home and game pages) */
+  .sky-backdrop {
+    background:
+      radial-gradient(120% 80% at 50% 0%, rgba(255, 213, 128, 0.18), transparent 60%),
+      radial-gradient(80% 50% at 90% 15%, rgba(255, 165, 0, 0.22), transparent 60%),
+      linear-gradient(to bottom, #0f172a 0%, #1e3a8a 35%, #3b82f6 65%, #f97316 100%);
   }
-  
-  .animate-pulse-glow {
-    animation: pulse-glow 2s ease-in-out infinite;
-  }
-  
+
+  .animate-float-slow { animation: float-slow 5s ease-in-out infinite; }
+  .animate-float-medium { animation: float-medium 4s ease-in-out infinite; }
+  .animate-float-fast { animation: float-fast 3s ease-in-out infinite; }
+  .animate-pulse-glow { animation: pulse-glow 2.2s ease-in-out infinite; }
+  .animate-pulse-glow-emerald { animation: pulse-glow-emerald 2.2s ease-in-out infinite; }
+  .animate-spin-slow { animation: spin-slow 20s linear infinite; }
+
   .animate-shimmer {
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
     background-size: 200% 100%;
     animation: shimmer 2s infinite;
   }
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+  .text-balance { text-wrap: balance; }
+  .text-pretty { text-wrap: pretty; }
 }
