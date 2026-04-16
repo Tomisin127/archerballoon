@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
-export function ResponseLogger() {
+function ResponseLoggerInner() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -68,4 +68,12 @@ export function ResponseLogger() {
   }, [pathname, searchParams]);
 
   return null;
+}
+
+export function ResponseLogger(): React.ReactElement {
+  return (
+    <Suspense fallback={null}>
+      <ResponseLoggerInner />
+    </Suspense>
+  );
 }
