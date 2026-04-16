@@ -65,6 +65,7 @@ export const metadata: Metadata = {
   },
   other: { 
     "base:app_id": "69510fdd4d3a403912ed8394",
+    "builder-code": "bc_fmi9q4ud",
     "fc:frame": JSON.stringify({
       "version": "next",
       "imageUrl": "https://files.catbox.moe/ugigc7.jpeg",
