@@ -17,6 +17,8 @@ export interface Balloon {
   breathPhase: number;
 }
 
+export type ParticleShape = 'rect' | 'circle' | 'star' | 'text' | 'ring';
+
 export interface Particle {
   x: number;
   y: number;
@@ -26,4 +28,10 @@ export interface Particle {
   maxLife: number;
   color: string;
   radius: number;
+  rotation: number;
+  rotationSpeed: number;
+  shape: ParticleShape;
+  size: number;
+  text?: string;
+  gravity?: number;
 }
