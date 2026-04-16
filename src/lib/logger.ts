@@ -9,11 +9,9 @@ const logger = createLogger({
   ),
   transports: [
     new transports.Console(),
-    new transports.File({ filename: "../output.log" }),
   ],
   exceptionHandlers: [
     new transports.Console(),
-    new transports.File({ filename: "../error.log" }),
   ],
 });
 

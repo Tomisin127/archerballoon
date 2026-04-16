@@ -30,8 +30,9 @@ export const config = createConfig({
   storage: createStorage({ storage: cookieStorage }),
   ssr: true,
   transports: {
-    [base.id]: http('https://mainnet.base.org'),
-    [baseSepolia.id]: http('https://sepolia.base.org'),
+    [activeChain.id]: activeChain.id === base.id 
+      ? http('https://mainnet.base.org') 
+      : http('https://sepolia.base.org'),
     [mainnet.id]: http(), // For ENS resolution
   },
 });
